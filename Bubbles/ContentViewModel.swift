@@ -5,8 +5,9 @@
 //  Created by Marcelo Sampaio on 16/11/24.
 //
 import Foundation
-import SwiftUICore
+import SwiftUI
 
+@MainActor
 class ContentViewModel: ObservableObject {
     @Published var bubbles: [Bubble] = []
     private var screen: Screen = .init(width: .zero, height: .zero)
@@ -32,9 +33,10 @@ class ContentViewModel: ObservableObject {
     
     private func animateBubbles() {
         for index in bubbles.indices {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0...2)) {
-                withAnimation(Animation.easeOut(duration: self.bubbles[index].speed).repeatForever(autoreverses: false)) {
-                    self.bubbles[index].positionY = -100 // Move bubbles out of view
+            Task {
+                try await Task.sleep(nanoseconds: UInt64(Double.random(in: 0...2) * 1_000_000_000))
+                withAnimation(Animation.easeOut(duration: bubbles[index].speed).repeatForever(autoreverses: false)) {
+                    bubbles[index].positionY = -100 // Move bubbles out of view
                 }
             }
         }
